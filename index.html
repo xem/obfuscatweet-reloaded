@@ -3,8 +3,8 @@
 <title>Obfusc-a-tweet reloaded</title>
 <a href=//github.com/xem/obfuscatweet-reloaded><img style="position:absolute;top:0;right:0;border:0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"></a>
 <style>
-body { width: 700px; margin: 0 auto; font-family: arial; }
-textarea { width: 700px; height: 250px; border: 2px solid #000; padding: 15px }
+body { width: 750px; margin: 0 auto; font-family: arial; }
+textarea { width: 750px; height: 250px; border: 2px solid #000; padding: 15px }
 </style>
 <center>
 <h1>Obfusc-a-tweet reloaded</h1>
@@ -69,16 +69,16 @@ o = o + "//";
 
 // Split the result in up to 3 4084-chars blocks and 1 4082-chars block
 
-a = o.substr(0,4084);
-b = o.substr(4084,8168);
-c = o.substr(8168,12252);
-d = o.substr(12252,16334);
+a = o.substring(0,4084);
+b = o.substring(4084,8168);
+c = o.substring(8168,12252);
+d = o.substring(12252,16334);
 
 // Embed the blocks in up to four URLs
 A = "http://a.fr/"+a;
 B = b.length ? (" http://a.fr/" + b) : "";
 C = c.length ? (" http://a.fr/" + c) : "";
-D = d.length ? (" http://a.fr/" + d) : "";
+D = d.length ? (" http://a.fr/" + d + "//") : "";
 
 
 // Surround these URLs with an unpacker/executer

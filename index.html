@@ -1,0 +1,91 @@
+<!doctype html>
+<meta charset=utf-8>
+<title>Obfusc-a-tweet reloaded</title>
+<a href=//github.com/xem/obfuscatweet-reloaded><img style="position:absolute;top:0;right:0;border:0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"></a>
+<style>
+body { width: 700px; margin: 0 auto; font-family: arial; }
+textarea { width: 700px; height: 250px; border: 2px solid #000; padding: 15px }
+</style>
+<center>
+<h1>Obfusc-a-tweet reloaded</h1>
+<b>Pack up to ~16kb of JavaScript in a single, executable tweet. (by abusing Twitter's URL shortener)</b>
+<br>
+<br>
+More info  <a href="http://xem.github.io/articles/#obfuscatweet_url_en">here</a>.
+<br>
+See the original obfusc-a-tweet app <a href="">here</a>.
+<br>
+<br>
+<br>
+Source (JS code):
+<br>
+<textarea id=s></textarea>
+<br>
+<br>
+Result (tweet):
+<textarea id=r readonly></textarea>
+<br>
+<br>
+<button onclick='window.open("http://twitter.com?status=paste%20the%20result%20here")'>tweet it!</button>&nbsp;
+<button onclick="eval(r.value.replace(/http/g,'. http'))">eval!</button>
+<br>
+<br>
+<br>
+© 2015 - Maxime Euzière
+</center>
+<script>
+s.value = "";
+r.value = "";
+
+s.oninput = function(){
+
+// Read input
+var o = s.value;
+
+// Empty case
+if(!o.length){
+  r.value = "";
+  return;
+}
+
+// URL-encode it
+o = encodeURI(o);
+
+// URL-encode the parenthesis characters
+o = o.replace(/\(/g, "%28");
+o = o.replace(/\)/g, "%29");
+
+// Decode the three chars that don't need to be encoded ([, ], |)
+o = o.replace(/%5B/gi, "[");
+o = o.replace(/%5D/gi, "]");
+o = o.replace(/%7C/gi, "|");
+
+if(o.length > 16334){
+  alert("Warning! After transformation, your input exceeds 16,334 bytes and will be truncated!");
+}
+
+// Append a double slash (//) at the end
+o = o + "//";
+
+// Split the result in up to 3 4084-chars blocks and 1 4082-chars block
+
+a = o.substr(0,4084);
+b = o.substr(4084,8168);
+c = o.substr(8168,12252);
+d = o.substr(12252,16334);
+
+// Embed the blocks in up to four URLs
+A = "http://a.fr/"+a;
+B = b.length ? (" http://a.fr/" + b) : "";
+C = c.length ? (" http://a.fr/" + c) : "";
+D = d.length ? (" http://a.fr/" + d) : "";
+
+
+// Surround these URLs with an unpacker/executer
+o = "eval(decodeURI(\"   " + A + B + C + D + "\".replace(/ .{14}/g,'')))";
+
+// Output the result as a tweetable message.
+r.value = o;
+
+}
+</script>

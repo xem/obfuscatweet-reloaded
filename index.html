@@ -8,7 +8,7 @@ textarea { width: 750px; height: 250px; border: 2px solid #000; padding: 15px }
 </style>
 <center>
 <h1>Obfusc-a-tweet reloaded</h1>
-<b>Pack up to ~16kb of JavaScript in a single, executable tweet. (by abusing Twitter's URL shortener)</b>
+<b>Pack up to 16,336 chars of JavaScript in a single, executable tweet.<br>(by abusing Twitter's URL shortener)</b>
 <br>
 <br>
 More info  <a href="http://xem.github.io/articles/#obfuscatweet_url_en">here</a>.
@@ -61,28 +61,25 @@ o = o.replace(/%5D/gi, "]");
 o = o.replace(/%7C/gi, "|");
 
 if(o.length > 16334){
-  alert("Warning! After transformation, your input exceeds 16,334 bytes and will be truncated!");
+  alert("Warning! After transformation, your input exceeds 16,336 bytes and will be truncated!");
 }
-
-// Append a double slash (//) at the end
-o = o + "//";
 
 // Split the result in up to 3 4084-chars blocks and 1 4082-chars block
 
 a = o.substring(0,4084);
 b = o.substring(4084,8168);
 c = o.substring(8168,12252);
-d = o.substring(12252,16334);
+d = o.substring(12252,16336);
 
 // Embed the blocks in up to four URLs
 A = "http://a.fr/"+a;
 B = b.length ? (" http://a.fr/" + b) : "";
 C = c.length ? (" http://a.fr/" + c) : "";
-D = d.length ? (" http://a.fr/" + d + "//") : "";
+D = d.length ? (" http://a.fr/" + d) : "";
 
 
 // Surround these URLs with an unpacker/executer
-o = "eval(decodeURI(\"   " + A + B + C + D + "\".replace(/ .{14}/g,'')))";
+o = "eval(decodeURI(\" 🖝" + A + B + C + D + "\".replace(/ .{1,14}/g,'')))";
 
 // Output the result as a tweetable message.
 r.value = o;

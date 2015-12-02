@@ -3,26 +3,46 @@
 <title>Obfusc-a-tweet reloaded</title>
 <a href=//github.com/xem/obfuscatweet-reloaded><img style="position:absolute;top:0;right:0;border:0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"></a>
 <style>
-body { width: 750px; margin: 0 auto; font-family: arial; }
-textarea { width: 750px; height: 250px; border: 2px solid #000; padding: 15px }
+* { box-sizing: border-box }
+body { width: 800px; margin: 0 auto; font-family: arial; }
+textarea { width: 800px; height: 150px; border: 2px solid #000; padding: 15px }
+textarea#tr { height: 50px; }
 </style>
 <center>
 <h1>Obfusc-a-tweet reloaded</h1>
 <b>Pack up to 16,336 chars of JavaScript in a single, executable tweet.<br>(by abusing Twitter's URL shortener)</b>
 <br>
 <br>
-More info  <a href="http://xem.github.io/articles/#obfuscatweet_url_en">here</a>.
+More info <a href="http://xem.github.io/articles/#obfuscatweet_url_en">here</a>.
 <br>
 See the original obfusc-a-tweet app <a href="">here</a>.
 <br>
 <br>
 <br>
-Source (JS code):
+<b>Source (JS code):</b>
 <br>
 <textarea id=s></textarea>
 <br>
 <br>
-Result (tweet):
+<b>Transform:</b>
+<br>
+</center>
+<label><input type=radio name=transform checked id=t1>Just URL-encode the characters that are not URL-safe</label>
+<br>
+<label><input type=radio name=transform id=t2>convert chars that need URL-encode into URL-safe chars (the source must contain ASCII only)</label>
+<br>
+<label><input type=radio name=transform id=t3 disabled>(SOON™) compress all the source into URL-safe chars (the source must contain ASCII only)</label>
+<center>
+<br>
+<br>
+<button id=b>Convert</button>
+<br>
+<br>
+<b>Transformed source:</b>
+<textarea id=tr readonly></textarea>
+<br>
+<br>
+<b>Result (tweetable):</b>
 <textarea id=r readonly></textarea>
 <br>
 <br>
@@ -35,36 +55,69 @@ Result (tweet):
 </center>
 <script>
 s.value = "";
+tr.value = "";
 r.value = "";
 
-s.oninput = function(){
+b.onclick = function(){
 
 // Read input
 var o = s.value;
 
 // Empty case
 if(!o.length){
+  alert("Source is empty!");
   r.value = "";
   return;
 }
 
-// URL-encode it
-o = encodeURI(o);
+// Apply transform
 
-// URL-encode the parenthesis characters
-o = o.replace(/\(/g, "%28");
-o = o.replace(/\)/g, "%29");
 
-// Decode the three chars that don't need to be encoded ([, ], |)
-o = o.replace(/%5B/gi, "[");
-o = o.replace(/%5D/gi, "]");
-o = o.replace(/%7C/gi, "|");
+// Transform 1:
 
-if(o.length > 16334){
-  alert("Warning! After transformation, your input exceeds 16,336 bytes and will be truncated!");
+if(t1.checked){
+  
+  // URL-encode all the source code
+  o = encodeURI(o);
+
+  // URL-encode the parenthesis characters
+  o = o.replace(/\(/g, "%28");
+  o = o.replace(/\)/g, "%29");
+
+  // Decode the three chars that don't need to be encoded ([, ], |)
+  o = o.replace(/%5B/gi, "[");
+  o = o.replace(/%5D/gi, "]");
+  o = o.replace(/%7C/gi, "|");
 }
 
-// Split the result in up to 3 4084-chars blocks and 1 4082-chars block
+// Transform 2:
+
+if(t2.checked){
+
+  // Convert all ASCII chars (U+0000 - U+007F) into latin-extended-A chars (U+0100 - U+017F) which are all URL-safe on Twitter
+  o2 = "";
+  for(i in o){
+    o2 += String.fromCharCode(0x0100 + o.charCodeAt(i));
+  }
+  o = o2;
+  
+  // Add decompressor (with correct urlencoding to work on twitter)
+  o = "eval%28unescape%28escape%28'" + o + "'%29.replace(/u../g,'')%29%29";
+}
+
+if(t3.checked){
+  alert(3);
+}
+
+// Place result in "transformed" textarea
+tr.value = o;
+
+if(o.length > 16336){
+  alert("Warning! After transformation, your input is "+ o.length + "chars long and exceeds the maximum length of 16336 chars. Please reduce it and/or try another transformation!");
+  r.value = "// WARNING: truncated output\n";
+}
+
+// Split the result in up to four 4084-chars blocks
 
 a = o.substring(0,4084);
 b = o.substring(4084,8168);
@@ -73,7 +126,7 @@ d = o.substring(12252,16336);
 
 // Embed the blocks in up to four URLs
 A = "http://a.fr/"+a;
-B = b.length ? (" http://a.fr/" + b) : "";
+B = b.length ? (" http://(.fr/" + b) : "";
 C = c.length ? (" http://a.fr/" + c) : "";
 D = d.length ? (" http://a.fr/" + d) : "";
 
@@ -82,7 +135,7 @@ D = d.length ? (" http://a.fr/" + d) : "";
 o = "eval(decodeURI(\" 🖝" + A + B + C + D + "\".replace(/ .{1,14}/g,'')))";
 
 // Output the result as a tweetable message.
-r.value = o;
+r.value += o;
 
 }
 </script>

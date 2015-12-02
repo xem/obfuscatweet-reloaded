@@ -113,7 +113,7 @@ if(t3.checked){
 tr.value = o;
 
 if(o.length > 16336){
-  alert("Warning! After transformation, your input is "+ o.length + "chars long and exceeds the maximum length of 16336 chars. Please reduce it and/or try another transformation!");
+  alert("Warning! After transformation, your input is "+ o.length + " chars long and exceeds the maximum length of 16336 chars. Please reduce it and/or try another transformation!");
   r.value = "// WARNING: truncated output\n";
 }
 
@@ -126,7 +126,7 @@ d = o.substring(12252,16336);
 
 // Embed the blocks in up to four URLs
 A = "http://a.fr/"+a;
-B = b.length ? (" http://(.fr/" + b) : "";
+B = b.length ? (" http://a.fr/" + b) : "";
 C = c.length ? (" http://a.fr/" + c) : "";
 D = d.length ? (" http://a.fr/" + d) : "";
 

@@ -63,10 +63,12 @@ b.onclick = function(){
 // Read input
 var o = s.value;
 
+// Reset output
+r.value = "";
+
 // Empty case
 if(!o.length){
   alert("Source is empty!");
-  r.value = "";
   return;
 }
 

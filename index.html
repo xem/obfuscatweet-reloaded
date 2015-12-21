@@ -10,7 +10,7 @@ textarea#tr { height: 50px; }
 </style>
 <center>
 <h1>Obfusc-a-tweet reloaded</h1>
-<b>Pack up to 16,336 chars of JavaScript in a single, executable tweet.<br>(by abusing Twitter's URL shortener)</b>
+<b>Pack ~16kb of JavaScript in a single, executable tweet.<br>(by abusing Twitter's URL shortener)</b>
 <br>
 <br>
 More info <a href="http://xem.github.io/articles/#obfuscatweet_url_en">here</a>.
@@ -19,7 +19,7 @@ See the original obfusc-a-tweet app <a href="">here</a>.
 <br>
 <br>
 <br>
-<b>Source (JS code):</b>
+<b>Source (JS code, ASCII only):</b>
 <br>
 <textarea id=s></textarea>
 <br>
@@ -27,11 +27,11 @@ See the original obfusc-a-tweet app <a href="">here</a>.
 <b>Transform:</b>
 <br>
 </center>
-<label><input type=radio name=transform checked id=t1>Just URL-encode the characters that are not URL-safe</label>
+<label><input type=radio name=transform checked id=t1>Option 1: just URL-encode the source code</label> <i>(store up to 16,336b of escaped JS)</i>
 <br>
-<label><input type=radio name=transform id=t2>convert chars that need URL-encode into URL-safe chars (the source must contain ASCII only)</label>
+<label><input type=radio name=transform id=t2>Option 2: Shift the source code</label> <i>(store up to 16,279b of raw JS)</i>
 <br>
-<label><input type=radio name=transform id=t3 disabled>(SOON™) compress all the source into URL-safe chars (the source must contain ASCII only)</label>
+<label><input type=radio name=transform id=t3 disabled>Option 3: radix-conversion of the source code (SOON™)</label>
 <center>
 <br>
 <br>

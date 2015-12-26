@@ -5,17 +5,18 @@
 <style>
 * { box-sizing: border-box }
 body { width: 800px; margin: 0 auto; font-family: arial; }
-textarea { width: 800px; height: 150px; border: 2px solid #000; padding: 15px }
-textarea#tr { height: 50px; }
+textarea { width: 800px; height: 150px; border: 2px solid #000; padding: 5px }
+textarea#tr { height: 80px; }
+input { width: 50px }
 </style>
 <center>
 <h1>Obfusc-a-tweet reloaded</h1>
-<b>Pack ~16kb of JavaScript in a single, executable tweet.<br>(by abusing Twitter's URL shortener)</b>
+<b>Pack 16kb+ of JavaScript in a single, executable tweet.<br>(by abusing Twitter's URL shortener)</b>
 <br>
 <br>
-More info <a href="http://xem.github.io/articles/#obfuscatweet_url_en">here</a>.
+More info <a href="http://xem.github.io/articles/#obfuscatweet_url_en">in this article</a>.
 <br>
-See the original obfusc-a-tweet app <a href="">here</a>.
+See the original obfusc-a-tweet app <a href="http://xem.github.io/obfuscatweet">here</a>.
 <br>
 <br>
 <br>
@@ -27,11 +28,14 @@ See the original obfusc-a-tweet app <a href="">here</a>.
 <b>Transform:</b>
 <br>
 </center>
-<label><input type=radio name=transform checked id=t1>Option 1: just URL-encode the source code</label> <i>(store up to 16,336b of escaped JS)</i>
+<label><input type=radio name=transform id=t1>Option 1: just URL-encode the source code</label> <i>(store up to 16,336b of escaped JS)</i>
 <br>
 <label><input type=radio name=transform id=t2>Option 2: Shift the source code</label> <i>(store up to 16,279b of raw JS)</i>
 <br>
-<label><input type=radio name=transform id=t3 disabled>Option 3: radix-conversion of the source code (SOON™)</label>
+<label><input type=radio name=transform id=t3 checked>Option 3: PNG bootstrap with <input type=number id=iter value=50> iterations + shift</label> <i>(store up to 16,070b of zipped JS)</i> (wip)
+<br>
+<!--label><input type=radio name=transform id=t3 disabled>Option 3: radix-conversion of the source code (SOON™)</label>
+<br-->
 <center>
 <br>
 <br>
@@ -51,17 +55,20 @@ See the original obfusc-a-tweet app <a href="">here</a>.
 <br>
 <br>
 <br>
-© 2015 - Maxime Euzière
+© 2015, 2016 - Maxime Euzière, Anders Kaare, Subzey
 </center>
+<script src="zopfli.zlib.min.js"></script>
+<script src="crc.js"></script>
+<script src="main.js"></script>
 <script>
-s.value = "";
+//s.value = "";
 tr.value = "";
 r.value = "";
 
 b.onclick = function(){
 
 // Read input
-var o = s.value;
+o = s.value;
 
 // Reset output
 r.value = "";
@@ -75,7 +82,7 @@ if(!o.length){
 // Apply transform
 
 
-// Transform 1:
+// Transform 1: urlencode
 
 if(t1.checked){
   
@@ -92,7 +99,7 @@ if(t1.checked){
   o = o.replace(/%7C/gi, "|");
 }
 
-// Transform 2:
+// Transform 2: shift
 
 if(t2.checked){
 
@@ -107,8 +114,46 @@ if(t2.checked){
   o = "eval%28unescape%28escape%28'" + o + "'%29.replace(/u../g,'')%29%29";
 }
 
+
+// Transform 3: PNG + shift
+
 if(t3.checked){
-  alert(3);
+  
+  // Make an array with each charCode of the source + 0x00
+  arr = [];
+  for(i in o){
+    arr.push(o.charCodeAt(i));
+  }
+  arr.push(0x00);
+  arr.push(0x00);
+  arr.push(0x00);
+    
+  // Pack in a PNG: Try all the filters
+  f1 = makePNGStub(arr, { iterations: iter.value || 50, filter: 'none' });
+  f2 = makePNGStub(arr, { iterations: iter.value || 50, filter: 'sub' });
+  f3 = makePNGStub(arr, { iterations: iter.value || 50, filter: 'up' });
+  f4 = makePNGStub(arr, { iterations: iter.value || 50, filter: 'average' });
+  f5 = makePNGStub(arr, { iterations: iter.value || 50, filter: 'paeth' });
+  
+  // Choose the best filter
+  f = f1;
+  if(f2.length < f1.length){ binascii = f2; }
+  if(f3.length < f2.length){ binascii = f3; }
+  if(f4.length < f3.length){ binascii = f4; }
+  if(f5.length < f4.length){ binascii = f5; }
+  
+  // Put the PNG binary in a string, and add an unpacker around
+  f = "(z=new Image).src='data:;base64,'+btoa('"+f.replace(/\'/g,"\\'").replace(/\r/g,"\\r").replace(/\n/g,"\\n").replace(/\\0/g,"\0")+"');V=document.createElement('canvas');C=V.getContext('2d');for($=_='';C.drawImage(z,$--,0),X=(q=C.getImageData(0,0,64,32)).data[0];_+=String.fromCharCode(X));(e=eval)(_)";
+  
+  // Convert PNG bytes to shifted chars;
+  g = "";
+  for(i in f){
+    g += String.fromCharCode(0x0100 + f.charCodeAt(i));
+  }
+  
+  // Add decompressor (with correct urlencoding to work on twitter)
+  o = "eval%28unescape%28escape%28'" + g + "'%29.replace(/u../g,'')%29%29";
+  
 }
 
 // Place result in "transformed" textarea
@@ -127,10 +172,10 @@ c = o.substring(8168,12252);
 d = o.substring(12252,16336);
 
 // Embed the blocks in up to four URLs
-A = "http://a.fr/"+a;
-B = b.length ? (" http://a.fr/" + b) : "";
-C = c.length ? (" http://a.fr/" + c) : "";
-D = d.length ? (" http://a.fr/" + d) : "";
+A = "http://h.ck/"+a;
+B = b.length ? (" http://h.ck/" + b) : "";
+C = c.length ? (" http://h.ck/" + c) : "";
+D = d.length ? (" http://h.ck/" + d) : "";
 
 
 // Surround these URLs with an unpacker/executer

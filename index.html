@@ -51,7 +51,7 @@ See the original obfusc-a-tweet app <a href="http://xem.github.io/obfuscatweet">
 <br>
 <br>
 <button onclick='window.open("http://twitter.com?status=paste%20the%20result%20here")'>tweet it!</button>&nbsp;
-<button onclick="eval(r.value.replace(/http/g,'. http'))">eval!</button>
+<button onclick="eval(r.value.replace(/(http.*?)http/g,'$1. http'))">eval!</button>
 <br>
 <br>
 <br>
@@ -119,14 +119,14 @@ if(t2.checked){
 
 if(t3.checked){
   
-  // Make an array with each charCode of the source + 0x00
+  // Make an array with each charCode of the source + some 0x00 
   arr = [];
   for(i in o){
     arr.push(o.charCodeAt(i));
   }
   arr.push(0x00);
-  arr.push(0x00);
-  arr.push(0x00);
+  //arr.push(0x00);
+  //arr.push(0x00);
     
   // Pack in a PNG: Try all the filters
   f1 = makePNGStub(arr, { iterations: iter.value || 50, filter: 'none' });
@@ -141,18 +141,18 @@ if(t3.checked){
   if(f3.length < f2.length){ binascii = f3; }
   if(f4.length < f3.length){ binascii = f4; }
   if(f5.length < f4.length){ binascii = f5; }
+
+  // Prepend an unpacker
+  h = "(z=new Image).src='data:;base64,'+btoa(g.slice(215));C=document.createElement('canvas').getContext('2d');for($=_='';C.drawImage(z,$--,0),X=(q=C.getImageData(0,0,64,32)).data[0];_+=String.fromCharCode(X));(e=eval)(_)" + f
   
-  // Put the PNG binary in a string, and add an unpacker around
-  f = "(z=new Image).src='data:;base64,'+btoa('"+f.replace(/\'/g,"\\'").replace(/\r/g,"\\r").replace(/\n/g,"\\n").replace(/\\0/g,"\0")+"');V=document.createElement('canvas');C=V.getContext('2d');for($=_='';C.drawImage(z,$--,0),X=(q=C.getImageData(0,0,64,32)).data[0];_+=String.fromCharCode(X));(e=eval)(_)";
-  
-  // Convert PNG bytes to shifted chars;
+  // Shift unpacker chars and PNG bytes
   g = "";
-  for(i in f){
-    g += String.fromCharCode(0x0100 + f.charCodeAt(i));
+  for(i in h){
+    g += String.fromCharCode(0x0100 + h.charCodeAt(i));
   }
   
   // Add decompressor (with correct urlencoding to work on twitter)
-  o = "eval%28unescape%28escape%28'" + g + "'%29.replace(/u../g,'')%29%29";
+  o = "eval%28%28g=unescape%28escape%28'" + g + "'%29.replace(/u../g,'')%29%29.slice(0,215)%29";
   
 }
 

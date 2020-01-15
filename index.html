@@ -29,11 +29,11 @@ Demo: <a href="https://twitter.com/MaximeEuziere/status/681111020560072704">prin
 <b>Transform:</b>
 <br>
 </center>
-<label><input type=radio name=transform id=t1>Option 1: just URL-encode the source code</label> <i>(store up to 32,616b of escaped JS)</i>
+<label><input type=radio name=transform id=t1 checked>Option 1: just URL-encode the source code</label> <i>(store up to 32,616b of escaped JS)</i>
 <br>
 <label><input type=radio name=transform id=t2>Option 2: Shift the source code</label> <i>(store up to 32,559b of raw JS)</i>
 <br>
-<label><input type=radio name=transform id=t3 checked>Option 3: PNG bootstrap with <input type=number id=iter value=50> iterations + shift</label> <i>(store up to 32,311b of gzipped JS)</i>
+<label><input type=radio name=transform id=t3>Option 3: PNG bootstrap with <input type=number id=iter value=50> iterations + shift</label> <i>(store up to 32,311b of gzipped JS)</i>
 <br>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Browser support: Firefox and Chrome for source &lt; 16kb. Chrome only for larger source code.
 <br>
 <!--label><input type=radio name=transform id=t3 disabled>Option 3: radix-conversion of the source code (SOON™)</label>
@@ -73,7 +73,7 @@ b.onclick = function(){
 o = s.value;
 
 // Filter
-o = o.replace(/[^ -~]/g, "");
+o = o.replace(/[^\r\n -~]/g, "");
 
 // Reset output
 r.value = "";

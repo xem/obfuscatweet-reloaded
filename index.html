@@ -29,11 +29,11 @@ Demo: <a href="https://twitter.com/MaximeEuziere/status/681111020560072704">prin
 <b>Transform:</b>
 <br>
 </center>
-<label><input type=radio name=transform id=t1>Option 1: just URL-encode the source code</label> <i>(store up to 16,336b of escaped JS)</i>
+<label><input type=radio name=transform id=t1>Option 1: just URL-encode the source code</label> <i>(store up to 32,616b of escaped JS)</i>
 <br>
-<label><input type=radio name=transform id=t2>Option 2: Shift the source code</label> <i>(store up to 16,279b of raw JS)</i>
+<label><input type=radio name=transform id=t2>Option 2: Shift the source code</label> <i>(store up to 32,559b of raw JS)</i>
 <br>
-<label><input type=radio name=transform id=t3 checked>Option 3: PNG bootstrap with <input type=number id=iter value=50> iterations + shift</label> <i>(store up to 16,031b of gzipped JS)</i>
+<label><input type=radio name=transform id=t3 checked>Option 3: PNG bootstrap with <input type=number id=iter value=50> iterations + shift</label> <i>(store up to 32,311b of gzipped JS)</i>
 <br>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Browser support: Firefox and Chrome for source &lt; 16kb. Chrome only for larger source code.
 <br>
 <!--label><input type=radio name=transform id=t3 disabled>Option 3: radix-conversion of the source code (SOON™)</label>
@@ -57,7 +57,7 @@ Demo: <a href="https://twitter.com/MaximeEuziere/status/681111020560072704">prin
 <br>
 <br>
 <br>
-© 2015, 2016 - Maxime Euzière, Anders Kaare, Subzey
+© 2015-2020 - Xem, Anders Kaare, Subzey
 </center>
 <script src="zopfli.zlib.min.js"></script>
 <script src="crc.js"></script>
@@ -71,6 +71,9 @@ b.onclick = function(){
 
 // Read input
 o = s.value;
+
+// Filter
+o = o.replace(/[^ -~]/g, "");
 
 // Reset output
 r.value = "";
@@ -161,27 +164,35 @@ if(t3.checked){
 // Place result in "transformed" textarea
 tr.value = o;
 
-if(o.length > 16336){
-  alert("Warning! After transformation, your input is "+ o.length + " chars long and exceeds the maximum length of 16336 chars. Please reduce it and/or try another transformation!");
+if(o.length > 32672){
+  alert("Warning! After transformation, your input is "+ o.length + " chars long and exceeds the maximum length of 32672 chars. Please reduce it and/or try another transformation!");
   r.value = "// WARNING: truncated output\n";
 }
 
-// Split the result in up to four 4084-chars blocks
+// Split the result in up to eight 4084-chars blocks
 
-a = o.substring(0,4084);
-b = o.substring(4084,8168);
-c = o.substring(8168,12252);
-d = o.substring(12252,16336);
+a = o.substring(0,4077);
+b = o.substring(4077,4077*2);
+c = o.substring(4077*2,4077*3);
+d = o.substring(4077*3,4077*4);
+e = o.substring(4077*4,4077*5);
+f = o.substring(4077*5,4077*6);
+g = o.substring(4077*6,4077*7);
+h = o.substring(4077*7,4077*8);
 
 // Embed the blocks in up to four URLs
 A = "http://h.ck/"+a;
 B = b.length ? (" http://h.ck/" + b) : "";
 C = c.length ? (" http://h.ck/" + c) : "";
 D = d.length ? (" http://h.ck/" + d) : "";
+E = e.length ? (" http://h.ck/" + e) : "";
+F = f.length ? (" http://h.ck/" + f) : "";
+G = g.length ? (" http://h.ck/" + g) : "";
+H = h.length ? (" http://h.ck/" + h) : "";
 
 
 // Surround these URLs with an unpacker/executer
-o = "eval(decodeURI(\" 🖝" + A + B + C + D + "\".replace(/ .{1,14}/g,'')))";
+o = `eval(decodeURI(\` ` + A + B + C + D + E + F + G + H + `\`.replace(/ .{1,12}/g,'')))`;
 
 // Output the result as a tweetable message.
 r.value += o;
